@@ -89,38 +89,42 @@ class Fluke8846A:
         control. All front-panel keys, except the local key, are disabled."""
         return self.__write_data('SYST:REM')
 
-    def get_current_config(self):
+    def get_current_config(self) -> str:
         """Retrieves present Meter configuration"""
         return self.__get_data('CONF?')
+
+    def set_display_status(self, status = 'ON') -> bool:
+        """Enables or disables the Meter's display"""
+        return self.__write_data('DISP {}'.format(status))
 
     '''2 wire resistance'''
 
     def get_2w_resistance_range(self) -> str:
-        """Get 2-wire resistance measurement range"""
+        """Gets 2-wire resistance measurement range"""
         return self.__get_data('SENS:RES:RANG?')
 
     def set_2w_resistance(self, range = 'DEF', resolution = 'MIN') -> bool:
-        """Select 2-wire resistance function"""
+        """Selects 2-wire resistance function"""
         return self.__write_data('CONF:RES {}, {}'.format(range, resolution))
 
     '''4 wire resistance'''
 
     def set_4w_resistance(self, range = 'DEF', resolution = 'MIN') -> bool:
-        """Select 4-wire resistance function"""
+        """Selects 4-wire resistance function"""
         return self.__write_data('CONF:FRES {}, {}'.format(range, resolution))
 
     def get_2w_resistance_range(self) -> str:
-        """Get 4-wire resistance measurement range"""
+        """Gets 4-wire resistance measurement range"""
         return self.__get_data('SENS:FRES:RANG?')
 
     '''DC voltage'''
 
     def set_dc_voltage(self, range = 'DEF', resolution = 'MIN') -> bool:
-        """Select dc volts function """
+        """Selects dc volts function """
         return self.__write_data('CONF:VOLT:DC {}, {}'.format(range, resolution))
 
     def get_dc_voltage_range(self) -> str:
-        """Get dc volts measurement range"""
+        """Gets dc volts measurement range"""
         return self.__get_data('SENS:VOLT:DC:RANG?')
 
 
@@ -131,7 +135,7 @@ class Fluke8846A:
         return self.__write_data('CONF:VOLT:AC {}, {}'.format(range,resolution))
     
     def get_ac_voltage_range(self) -> str:
-        """Get ac volts measurement range"""
+        """Gets ac volts measurement range"""
         return self.__get_data('SENS:VOLT:AC:RANG?')
 
     '''DC voltage ratio'''
@@ -143,57 +147,57 @@ class Fluke8846A:
     '''DC current'''
 
     def set_dc_current(self, range = 'DEF', resolution = 'MIN') -> bool:
-        """Select dc current function """
+        """Selects dc current function """
         return self.__write_data('CONF:CURR:DC {}, {}'.format(range, resolution))
 
     def get_dc_voltage_range(self) -> str:
-        """Get dc current measurement range"""
+        """Gets dc current measurement range"""
         return self.__get_data('SENS:CURR:DC:RANG?')
 
     '''AC current'''
 
     def set_ac_current(self, range = 'DEF', resolution = 'MIN') -> bool:
-        """Select ac current function """
+        """Selects ac current function """
         return self.__write_data('CONF:CURR:AC {}, {}'.format(range, resolution))
 
     def get_ac_voltage_range(self) -> str:
-        """Get ac current measurement range"""
+        """Gets ac current measurement range"""
         return self.__get_data('SENS:CURR:AC:RANG?')
 
     '''Selects frequency function'''
     
     def set_frequency(self, range = 'DEF', resolution = 'MIN') -> bool:
-        """Select frequency function"""
+        """Selects frequency function"""
         return self.__write_data('CONF:FREQ {}, {}'.format(range, resolution))
 
     def get_frequency_range(self) -> str:
-        """Get frequency range"""
+        """Gets frequency range"""
         return self.__get_data('SENS:FREQ:RANG?')
 
     '''Selects period function'''
     
     def set_period(self, range = 'DEF', resolution = 'MIN') -> bool:
-        """Select period function"""
+        """Selects period function"""
         return self.__write_data('CONF:PER {}, {}'.format(range, resolution))
 
     def get_period_range(self) -> str:
-        """Get period range"""
+        """Gets period range"""
         return self.__get_data('SENS:PER:RANG?')
 
     '''Selects capacitance function'''
     
     def set_capacitance(self, range = 'DEF', resolution = 'MIN') -> bool:
-        """Select capacitance function"""
+        """Selects capacitance function"""
         return self.__write_data('CONF:CAP {}, {}'.format(range, resolution))
 
     def get_capacitance_range(self) -> str:
-        """Get capacitance range"""
+        """Gets capacitance range"""
         return self.__get_data('SENS:CAP:RANG?')    
 
     '''Selects temperature 2-wire function'''
     
     def set_2w_temperature(self, type = 'DEF') -> bool:
-        """Select temperature 2-wire function"""
+        """Selects temperature 2-wire function"""
         rtd = ['PT100_385', 'PT100_392', 'CUST1']
         if type in rtd:
             return self.__write_data('CONF:TEMP:RTD {}'.format(type))
@@ -204,7 +208,7 @@ class Fluke8846A:
     '''Selects temperature 4-wire function'''
     
     def set_4w_temperature(self, type = 'DEF') -> bool:
-        """Select temperature 4-wire function"""
+        """Selects temperature 4-wire function"""
         rtd = ['PT100_385', 'PT100_392', 'CUST1']
         if type in rtd:
             return self.__write_data('CONF:TEMP:FRTD {}'.format(type))
@@ -215,14 +219,105 @@ class Fluke8846A:
     '''Selects continuity function'''
 
     def set_continuity(self) -> bool:
-        """Select continuity function"""
+        """Selects continuity function"""
         return self.__write_data('CONF:CONT')
 
     '''Selects diode function'''
 
     def set_diode(self, low_current = 'ON', high_voltage = 'OFF')-> bool:
-        """Select diode function"""
+        """Selects diode function"""
         return self.__write_data('CONF:DIOD {}, {}'.format(low_current, high_voltage))
+
+    '''Triggering'''
+
+    def set_trigger_source(self, triggering_source = 'IMM')-> bool:
+        """Sets the source from which the Meter will expect a measurement trigger.
+
+        Parameters
+        ----------
+        triggering_source : type - str
+            - BUS : Sets the Meter to expect a trigger through the IEEE-488 bus or upon execution of a *TRG command.
+            - IMMediate : Selects Meter's internal triggering system.
+            - EXTernal : Sets the Meter to sense triggers through the trigger jack on the rear panel of the Meter.     
+
+        Returns
+        -------
+        bool status
+        """
+        sources = ['BUS', 'IMM', 'EXT', 'IMMEDIATE', 'EXTERNAL']
+        if triggering_source.upper() in sources: 
+            return self.__write_data('TRIG:SOUR {}'.format(triggering_source.upper()))
+        else:
+            print('Please check triggering source parameter.')
+            return False
+
+    def set_trigger_delay(self, trigger_delay = 'MIN')-> bool:
+        """Sets the delay between receiving a trigger and the beginning of measurement cycle.
+        
+        Parameters
+        ----------
+        trigger_delay : type - int or str
+            - 0 to 3600 : Delay specified in seconds.
+            - MINimum : Delay set to 0 seconds.
+            - MAXimum : Delay set to 3600 seconds.     
+
+        Returns
+        -------
+        bool status
+        """
+        return self.__write_data('TRIG:DEL {}'.format(trigger_delay))
+
+    def set_trigger_count(self, trigger_count = 1)-> bool:
+        """Sets the number of triggers the Meter will take before switching to an idle state. """
+        return self.__write_data('TRIG:COUN {}'.format(trigger_count))
+    
+    def set_samples_per_trigger(self, samples_count = 1)-> bool:
+        """Sets the number of measurements the Meter takes per trigger."""
+        return self.__write_data('SAMP:COUN {}'.format(samples_count))
+
+    def init_wait_for_triger(self) -> bool:
+        """Sets the Meter to the wait-for-trigger state in which the next trigger from
+        the selected source triggers a measurement cycle. Up to 5,000
+        measurements are placed into the Meter's internal memory, where they can
+        be retrieved with the FETCh? command.
+        
+        Returns
+        -------
+        bool status
+        """
+        return self.__write_data('INIT')
+
+    def read_sample_per_trigger(self) -> str:
+        """Sets the Meter in to the wait-for-trigger state where the next trigger from
+        the selected source triggers a measurement cycle. Measurements are sent
+        directly to the output buffer.
+        
+        Returns
+        -------
+        str : sample
+        """
+        return self.__get_data('READ?')
+
+    def fetch_data(self, data_source = 1) -> str:
+        """ Moves measurements stored in the Meter's internal memory to the output
+            buffer. FETCh1? or FETCh? returns measurements from the primary
+            display. FETCh2? Returns readings from the secondary display.
+        
+        Parameters
+        ----------
+        data_source : type - int
+            - 1 : returns measurements from the primary display,
+            - 2 : returns readings from the secondary display.
+
+        Returns
+        -------
+        str : samples defined by trigger and sample count.
+        """
+
+        if data_source in [1,2]:
+            return self.__get_data('FETC{}?'.format(data_source))
+        else:
+            print('Please check data_source parameter.')
 
     @staticmethod
     def list_instruments()->str:
