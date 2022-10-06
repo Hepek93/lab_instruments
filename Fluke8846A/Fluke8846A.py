@@ -207,8 +207,21 @@ class Fluke8846A:
 
     '''Selects temperature 4-wire function'''
     
-    def set_4w_temperature(self, type = 'DEF') -> bool:
-        """Selects temperature 4-wire function"""
+    def set_4w_temperature(self, type = 'PT100_385') -> bool:
+        """Selects temperature 4-wire function.
+        The range and resolution are fixed for temperature measurements.
+
+        Parameters
+        ----------
+        type : str
+            - PT100_385 - sensor type PT100 385
+            - PT100_392 - sensor type PT100 392
+            - CUST1     - meter using the values set into the R0 and Alpha parameters. ()
+
+        Returns
+        -------
+        bool status
+        """
         rtd = ['PT100_385', 'PT100_392', 'CUST1']
         if type in rtd:
             return self.__write_data('CONF:TEMP:FRTD {}'.format(type))
@@ -216,16 +229,37 @@ class Fluke8846A:
             print('Please check sensor type.')
             return False
 
-    '''Selects continuity function'''
+    '''Selects continuity function.'''
 
     def set_continuity(self) -> bool:
-        """Selects continuity function"""
+        """Selects continuity function.
+        The range and resolution are fixed for continuity tests: 1 kΩ range and
+        5½ digits.
+
+        Returns
+        -------
+        bool status
+        """
         return self.__write_data('CONF:CONT')
 
     '''Selects diode function'''
 
     def set_diode(self, low_current = 'ON', high_voltage = 'OFF')-> bool:
-        """Selects diode function"""
+        """Selects diode function. The range and resolution are fixed for diode test: 10 Vdc range and 5½ digits.
+        
+        Parameters
+        ----------
+        low_current : type - str
+            - ON  - sets the diode test current to 0.1 mA.
+            - OFF - sets the diode test current to 1 mA.
+        high_voltage : type - str
+            - ON  - sets the diode test voltage to 10 V.
+            - OFF - setst the diode test voltage to 5 V.
+
+        Returns
+        -------
+        bool status
+        """
         return self.__write_data('CONF:DIOD {}, {}'.format(low_current, high_voltage))
 
     '''Triggering'''
@@ -268,11 +302,37 @@ class Fluke8846A:
         return self.__write_data('TRIG:DEL {}'.format(trigger_delay))
 
     def set_trigger_count(self, trigger_count = 1)-> bool:
-        """Sets the number of triggers the Meter will take before switching to an idle state. """
+        """Sets the number of triggers the Meter will take before switching to an idle state. 
+        
+        Parameters
+        ----------
+        samples_count : type - int or str
+            - 0 to 50000 : Number of triggers before Meter becomes idle.
+            - MINimum : Number of triggers is set to 1.
+            - MAXimum : Number of triggers is set to 50000.
+            - INFinite: Continuously accepts triggers. A device clear is required to 
+                        set the Meter to idle state after INFinite has been set.     
+
+        Returns
+        -------
+        bool status 
+        """
         return self.__write_data('TRIG:COUN {}'.format(trigger_count))
     
     def set_samples_per_trigger(self, samples_count = 1)-> bool:
-        """Sets the number of measurements the Meter takes per trigger."""
+        """Sets the number of measurements the Meter takes per trigger.
+        
+        Parameters
+        ----------
+        samples_count : type - int or str
+            - 0 to 50000 : Number of measurements per trigger.
+            - MINimum : Number of measurements per trigger set to 1.
+            - MAXimum : Number of measurements per trigger set to 50000.     
+
+        Returns
+        -------
+        bool status        
+        """
         return self.__write_data('SAMP:COUN {}'.format(samples_count))
 
     def init_wait_for_triger(self) -> bool:
