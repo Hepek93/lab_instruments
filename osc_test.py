@@ -1,5 +1,12 @@
-from RigolDS1054Z.RigolDS1054Z import RigolDS1054Z
+from RigolDS1054Z.Oscilloscope import Oscilloscope
+from time import sleep
 
-osc = RigolDS1054Z('TCPIP::192.168.123.2::INSTR', read_termination='\n')
+osc = Oscilloscope()
 
-print(osc.get_info())
+
+osc.get_info(1)
+
+voltage, time = osc.convert_data_to_v_t(osc.get_screen_data('CHAN1'))
+
+
+osc.write_to_csv('test.csv', time, voltage)
