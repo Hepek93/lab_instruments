@@ -20,7 +20,7 @@ class Oscilloscope:
         self.channel3 = Channel()
         self.channel4 = Channel()
         self.active_channel = None
-        self.rigol = RigolDS1054Z('TCPIP::192.168.123.2::INSTR', read_termination='\n', delay=0)
+        self.rigol = RigolDS1054Z('TCPIP::192.168.123.2::INSTR', read_termination='\n', timeout=100_000)
 
     def get_info(self,channel):
         data = self.rigol.get_waveform_parameters().split(',')
@@ -89,6 +89,7 @@ class Oscilloscope:
         self.get_info(channel)
         return self.rigol.get_waveform_data()
     
+    
     def convert_data_to_v_t(self, data):
         voltage = []
         time = []
@@ -101,9 +102,34 @@ class Oscilloscope:
             t+=t_inc
         return voltage,time
     
+    def get_memory_data(self, channel):
+        #print(self.rigol.get_reading_mode())
+        self.rigol.stop()
+
+        self.rigol.set_memory_depth(12_000_000)
+        self.rigol.set_waveform_channel(channel)
+        self.rigol.set_reading_mode('RAW')
+        self.rigol.set_return_format_waveform('BYTE')
+        self.rigol.set_start_point_waveform_data(1)
+        self.rigol.set_stop_point_waveform_data(125000)
+        voltage = (self.rigol.get_waveform_data())
+        self.rigol.set_start_point_waveform_data(125001)
+        self.rigol.set_stop_point_waveform_data(250000)
+        voltage.extend(self.rigol.get_waveform_data())
+        self.rigol.set_start_point_waveform_data(250001)
+        self.rigol.set_stop_point_waveform_data(375000)
+        voltage.extend(self.rigol.get_waveform_data())
+        self.rigol.set_start_point_waveform_data(375001)
+        self.rigol.set_stop_point_waveform_data(500000)
+        voltage.extend(self.rigol.get_waveform_data())
+        self.get_info(channel)
+        return voltage
+
     def write_to_csv(self, filename, time, voltage):
         with open(filename,'w') as f:
-            for i in range(len(voltage)):
-                f.write(f'{time[i]},{voltage[i]}\n')
-                
+            for i in range(len(voltage[0])):
+                f.write(f'{time[i]}')
+                for j in range(len(voltage)):
+                    f.write(f',{voltage[j][i]}')
+                f.write('\n')
         

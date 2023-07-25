@@ -458,7 +458,7 @@ class RigolDS1054Z:
         """
         return self.__get_data(':WAV:FORM?')
     
-    def get_waveform_data(self)->bytes:
+    def get_waveform_data(self)->list:
         """
         Read the waveform data.
         
@@ -494,6 +494,58 @@ class RigolDS1054Z:
             <yreference>: the vertical reference position in the Y direction.
         """
         return self.__get_data(':WAV:PRE?')
+
+    def set_start_point_waveform_data(self, start_point)->bool:
+        """
+        Set the start point of waveform data reading.
+
+        Parameters
+        ----------
+        start_point : type - str
+            - NORMal: 1 to 1200
+            - MAX: 1 to the number of effective points currently on the screen
+            - RAW: 1 to the current maximum memory depth
+        Returns
+        -------
+        bool status
+        """
+        return self.__write_data(f':WAV:STAR {start_point}')
+
+    def get_start_point_waveform_data(self)->str:
+        """
+        Returns query the start point of waveform data reading.
+        
+        Returns
+        -------
+        str - returns an integer that represents starting point.
+        """
+        return self.__get_data(':WAV:FORM?')
+
+    def set_stop_point_waveform_data(self, stop_point)->bool:
+        """
+        Set the stop point of waveform data reading.
+
+        Parameters
+        ----------
+        stop_point : type - str
+            - NORMal: 1 to 1200
+            - MAX: 1 to the number of effective points currently on the screen
+            - RAW: 1 to the current maximum memory depth
+        Returns
+        -------
+        bool status
+        """
+        return self.__write_data(f':WAV:STOP {stop_point}')
+
+    def get_stop_point_waveform_data(self)->str:
+        """
+        Returns query the stop point of waveform data reading.
+        
+        Returns
+        -------
+        str - returns an integer that represents stop point.
+        """
+        return self.__get_data(':WAV:STOP?')
 
     @staticmethod
     def list_instruments()->str:
