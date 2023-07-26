@@ -1,4 +1,5 @@
 from RigolDS1054Z.RigolDS1054Z import RigolDS1054Z
+from time import sleep
 
 class Channel:
     def __init__(self) -> None:
@@ -104,9 +105,9 @@ class Oscilloscope:
     
     def get_memory_data(self, channel):
         #print(self.rigol.get_reading_mode())
-        self.rigol.stop()
-
         self.rigol.set_memory_depth(12_000_000)
+        self.rigol.stop()
+        sleep(20)
         self.rigol.set_waveform_channel(channel)
         self.rigol.set_reading_mode('RAW')
         self.rigol.set_return_format_waveform('BYTE')
